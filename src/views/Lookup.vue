@@ -16,8 +16,6 @@
                 maxlength="1023"
                 placeholder="Station name / DS100 / IBNR"
                 v-model="query"
-                @keyup="autocomplete"
-
                 solo
             ></v-text-field>
           </v-list-item>
@@ -51,14 +49,14 @@ export default {
   data() {
     return {
       query: "",
-      stations: [
-        {name: "Karlsruhe Hbf", ds100: 'RK', eva: 8000191},
-        {name: "Frankfurt Hbf", ds100: 'FF', eva: 8000105},
-        {name: "München Hbf", ds100: 'MH', eva: 8000261},
-      ],
       haltestellen: [],
       typeaheadDisplay: []
     };
+  },
+  watch: {
+    query: function() {
+      this.autocomplete();
+    }
   },
   methods: {
     selectStation(value) {
@@ -66,11 +64,14 @@ export default {
       console.log(value);
     },
     autocomplete() {
-      if (this.query.length > 2) {
+      if (this.query.length > 1) {
         this.typeaheadDisplay = [];
         for (const haltestellenElement of this.haltestellen) {
           try {
-            if (haltestellenElement.NAME.substr(0, this.query.length).toUpperCase() === this.query.toUpperCase()) {
+            if (this.typeaheadDisplay.length > 20){
+              break;
+            }
+            if (this.filterConditions(haltestellenElement)) {
               this.typeaheadDisplay.push(haltestellenElement);
             }
           } catch (e) {
@@ -83,13 +84,23 @@ export default {
     },
     saveHaltestellen(results) {
       this.haltestellen = results.data;
+    },
+    filterConditions(element) {
+      if (!isNaN(this.query) && this.query.length > 5) {
+        return element.EVA_NR.substr(0, this.query.length).toUpperCase() === this.query.toUpperCase()
+      }
+      if (this.query.length > 2) {
+        return element.NAME.substr(0, this.query.length).toUpperCase() === this.query.toUpperCase() ||
+            element.DS100.substr(0, this.query.length).toUpperCase() === this.query.toUpperCase();
+      }
+      return element.DS100.substr(0, this.query.length).toUpperCase() === this.query.toUpperCase();
     }
+
   },
   mounted() {
     Papa.parse("/data/D_Bahnhof_2020_alle.CSV", {
       header: true,
       download: true,
-      haltestellen: this.haltestellen,
       complete: this.saveHaltestellen
     });
   }
