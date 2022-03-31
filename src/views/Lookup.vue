@@ -1,0 +1,69 @@
+<template>
+  <v-layout row wrap>
+    <v-flex text-xs-center>
+      <!-- header -->
+      <h1 class="primary--text display-3 font-weight-medium my-3">Stations</h1>
+      <v-card>
+        <v-list class="pa-0">
+          <v-list-item>
+            <v-text-field
+                :label="'Station query'"
+                autocomplete="off"
+                autofocus
+                clearable
+                flat
+                hide-details
+                maxlength="1023"
+                placeholder="Station name / DS100 / IBNR"
+                v-model="query"
+                solo
+            ></v-text-field>
+          </v-list-item>
+        </v-list>
+      </v-card>
+      <v-card class="mt-3">
+        <v-list class="pa-0" dense>
+          <v-list-item-group>
+            <template v-for="station in stations" >
+              <v-divider v-bind:key="station.eva + `-divider`"></v-divider>
+              <StationListEntry
+                  v-bind:key="station.eva + `-entry`"
+                  :station="station"
+                  @click="selectStation(station)">
+              </StationListEntry>
+            </template>
+          </v-list-item-group>
+        </v-list>
+      </v-card>
+      <!-- main -->
+    </v-flex>
+  </v-layout>
+</template>
+
+<script>
+import StationListEntry from "@/components/StationListEntry";
+export default {
+  name: "Lookup",
+  components: {StationListEntry},
+  data() {
+    return {
+      query: "",
+      stations: [
+        {name: "Karlsruhe Hbf", ds100: 'RK', eva: 8000191},
+        {name: "Frankfurt Hbf", ds100: 'FF', eva: 8000105},
+        {name: "München Hbf", ds100: 'MH', eva: 8000261},
+      ]
+    };
+  },
+  methods: {
+    selectStation(value) {
+      this.query = "";
+      console.log(value);
+    }
+  }
+}
+</script>
+
+<style scoped>
+
+</style>

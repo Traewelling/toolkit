@@ -2,13 +2,13 @@ import Vue from 'vue'
 import vuetify from './plugins/vuetify'
 import VueRouter from 'vue-router'
 import App from "@/App";
-import HelloWorld from "@/components/HelloWorld";
+import Lookup from "@/views/Lookup";
 
 Vue.use(VueRouter)
 
 let router = new VueRouter({
     routes: [
-        { path: '/lookup', component: HelloWorld },
+        { path: '/lookup', component: Lookup },
         { path: '*', redirect: '/lookup' }
     ]
 })
