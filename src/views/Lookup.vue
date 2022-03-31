@@ -16,6 +16,8 @@
                 maxlength="1023"
                 placeholder="Station name / DS100 / IBNR"
                 v-model="query"
+                @keyup="autocomplete"
+
                 solo
             ></v-text-field>
           </v-list-item>
@@ -24,10 +26,10 @@
       <v-card class="mt-3">
         <v-list class="pa-0" dense>
           <v-list-item-group>
-            <template v-for="station in stations" >
-              <v-divider v-bind:key="station.eva + `-divider`"></v-divider>
+            <template v-for="station in typeaheadDisplay" >
+              <v-divider v-bind:key="station.EVA_NR + `-divider`"></v-divider>
               <StationListEntry
-                  v-bind:key="station.eva + `-entry`"
+                  v-bind:key="station.EVA_NR + `-entry`"
                   :station="station"
                   @click="selectStation(station)">
               </StationListEntry>
@@ -54,22 +56,41 @@ export default {
         {name: "Frankfurt Hbf", ds100: 'FF', eva: 8000105},
         {name: "München Hbf", ds100: 'MH', eva: 8000261},
       ],
-      haltestellen: []
+      haltestellen: [],
+      typeaheadDisplay: []
     };
   },
   methods: {
     selectStation(value) {
       this.query = "";
       console.log(value);
+    },
+    autocomplete() {
+      if (this.query.length > 2) {
+        this.typeaheadDisplay = [];
+        for (const haltestellenElement of this.haltestellen) {
+          try {
+            if (haltestellenElement.NAME.substr(0, this.query.length).toUpperCase() === this.query.toUpperCase()) {
+              this.typeaheadDisplay.push(haltestellenElement);
+            }
+          } catch (e) {
+            // ignore
+          }
+        }
+      } else {
+        this.typeaheadDisplay = [];
+      }
+    },
+    saveHaltestellen(results) {
+      this.haltestellen = results.data;
     }
   },
   mounted() {
     Papa.parse("/data/D_Bahnhof_2020_alle.CSV", {
-      download: true,
       header: true,
-      complete: function(results) {
-        this.haltestellen=results;
-      }
+      download: true,
+      haltestellen: this.haltestellen,
+      complete: this.saveHaltestellen
     });
   }
 }
