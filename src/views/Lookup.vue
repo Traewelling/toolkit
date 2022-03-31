@@ -42,6 +42,7 @@
 
 <script>
 import StationListEntry from "@/components/StationListEntry";
+import Papa from "papaparse";
 export default {
   name: "Lookup",
   components: {StationListEntry},
@@ -52,7 +53,8 @@ export default {
         {name: "Karlsruhe Hbf", ds100: 'RK', eva: 8000191},
         {name: "Frankfurt Hbf", ds100: 'FF', eva: 8000105},
         {name: "München Hbf", ds100: 'MH', eva: 8000261},
-      ]
+      ],
+      haltestellen: []
     };
   },
   methods: {
@@ -60,6 +62,15 @@ export default {
       this.query = "";
       console.log(value);
     }
+  },
+  mounted() {
+    Papa.parse("/data/D_Bahnhof_2020_alle.CSV", {
+      download: true,
+      header: true,
+      complete: function(results) {
+        this.haltestellen=results;
+      }
+    });
   }
 }
 </script>
