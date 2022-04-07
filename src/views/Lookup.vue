@@ -50,6 +50,7 @@ export default {
     return {
       query: "",
       haltestellen: [],
+      betriebsstellen: [],
       typeaheadDisplay: []
     };
   },
@@ -82,9 +83,6 @@ export default {
         this.typeaheadDisplay = [];
       }
     },
-    saveHaltestellen(results) {
-      this.haltestellen = results.data;
-    },
     filterConditions(element) {
       if (!isNaN(this.query) && this.query.length > 5) {
         return element.EVA_NR.substr(0, this.query.length).toUpperCase() === this.query.toUpperCase()
@@ -101,8 +99,22 @@ export default {
     Papa.parse("/data/D_Bahnhof_2020_alle.CSV", {
       header: true,
       download: true,
-      complete: this.saveHaltestellen
+      complete: (result) => {
+        this.haltestellen = result.data;
+      }
     });
+    Papa.parse("/data/DBNetz-Betriebsstellenverzeichnis-Stand2021-10.csv", {
+      header: true,
+      download: true,
+      complete: (result) => {
+        let betriebsstellen = result.data.map((item) => {
+          item.NAME = item['RL100-Langname'];
+          item.DS100 = item['RL100-Code'];
+          return item;
+        });
+        this.haltestellen = this.haltestellen.concat(betriebsstellen);
+      }
+    })
   }
 }
 </script>

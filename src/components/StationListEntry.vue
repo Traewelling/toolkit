@@ -3,7 +3,9 @@
     <v-list-item-content>
       <v-list-item-title>{{ station.NAME }}</v-list-item-title>
       <v-list-item-subtitle class="text--accent-3">
-        <code>{{ station.DS100 }}</code> | {{ station.EVA_NR}}
+        <code>{{ station.DS100 }}</code> |
+        <span v-if="station.EVA_NR">{{ station.EVA_NR}}</span>
+        <span v-else>{{ station['RL100-Kurzname'] }}</span>
       </v-list-item-subtitle>
     </v-list-item-content>
   </v-list-item>
