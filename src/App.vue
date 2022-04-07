@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <v-navigation-drawer app expand-on-hover mini-variant>
+    <v-navigation-drawer app expand-on-hover mini-variant mobile-breakpoint="0">
       <v-list-item>
         <v-list-item-content>
           <v-list-item-title class="text-h6">
@@ -61,10 +61,3 @@ export default {
   }),
 };
 </script>
-
-<style>
-#container {
-  max-width: 550px;
-  padding: 8px;
-}
-</style>

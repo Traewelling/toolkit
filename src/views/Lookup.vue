@@ -2,7 +2,17 @@
   <v-container>
     <v-row>
       <v-col cols="12" offset="1" sm="5">
-        <h1 class="primary--text display-3 font-weight-regular my-3">Stations</h1>
+        <h1 class="primary--text display-3 font-weight-regular my-3">Stations
+          <v-btn color="primary" @click="loadStations" :disabled="loading > 0">
+            (Re-)load stations
+          </v-btn>
+          &nbsp;
+          <v-progress-circular
+              v-if="loading > 0"
+              color="primary"
+              indeterminate
+          ></v-progress-circular>
+        </h1>
       </v-col>
     </v-row>
     <v-row>
@@ -57,6 +67,7 @@ export default {
   data() {
     return {
       query: "",
+      loading: 0,
       haltestellen: [],
       typeaheadDisplay: [],
       selectedStation: null
@@ -100,21 +111,19 @@ export default {
             element.DS100.substr(0, this.query.length).toUpperCase() === this.query.toUpperCase();
       }
       return element.DS100.substr(0, this.query.length).toUpperCase() === this.query.toUpperCase();
-    }
-
-  },
-  mounted() {
-    const localHaltestellen = localStorage.getItem('haltestellen');
-    this.haltestellen = JSON.parse(localHaltestellen);
-
-    if (!localHaltestellen) {
+    },
+    loadStations() {
+      this.loading = 2;
+      localStorage.setItem('haltestellen', '');
       Papa.parse("/data/D_Bahnhof_2020_alle.CSV", {
         header: true,
         download: true,
         complete: (result) => {
           this.haltestellen = result.data;
           localStorage.setItem('haltestellen', JSON.stringify(this.haltestellen));
-        }
+          this.loading=0;
+        },
+        error: () => {this.loading=0;}
       });
       Papa.parse("/data/DBNetz-Betriebsstellenverzeichnis-Stand2021-10.csv", {
         header: true,
@@ -127,8 +136,19 @@ export default {
           });
           this.haltestellen = this.haltestellen.concat(betriebsstellen);
           localStorage.setItem('haltestellen', JSON.stringify(this.haltestellen));
-        }
+          this.loading=0;
+        },
+        error: () => {this.loading=0;}
       });
+    }
+  },
+  mounted() {
+    const localHaltestellen = localStorage.getItem('haltestellen');
+
+    if (!localHaltestellen) {
+      this.loadStations();
+    } else {
+      this.haltestellen = JSON.parse(localHaltestellen);
     }
   }
 }
