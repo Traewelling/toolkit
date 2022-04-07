@@ -7,16 +7,14 @@
         <v-list class="pa-0">
           <v-list-item>
             <v-text-field
-                :label="'Station query'"
                 autocomplete="off"
                 autofocus
                 clearable
                 flat
                 hide-details
                 maxlength="1023"
-                placeholder="Station name / DS100 / IBNR"
+                label="Station name / DS100 / IBNR"
                 v-model="query"
-                solo
             ></v-text-field>
           </v-list-item>
         </v-list>
@@ -25,10 +23,11 @@
         <v-list class="pa-0" dense>
           <v-list-item-group>
             <template v-for="station in typeaheadDisplay" >
-              <v-divider v-bind:key="station.EVA_NR + `-divider`"></v-divider>
+              <v-divider v-bind:key="station.EVA_NR + station.DS100 + `-divider`"></v-divider>
               <StationListEntry
-                  v-bind:key="station.EVA_NR + `-entry`"
+                  v-bind:key="station.EVA_NR + station.DS100 + `-entry`"
                   :station="station"
+                  :query="query"
                   @click="selectStation(station)">
               </StationListEntry>
             </template>
@@ -50,7 +49,6 @@ export default {
     return {
       query: "",
       haltestellen: [],
-      betriebsstellen: [],
       typeaheadDisplay: []
     };
   },
@@ -96,25 +94,32 @@ export default {
 
   },
   mounted() {
-    Papa.parse("/data/D_Bahnhof_2020_alle.CSV", {
-      header: true,
-      download: true,
-      complete: (result) => {
-        this.haltestellen = result.data;
-      }
-    });
-    Papa.parse("/data/DBNetz-Betriebsstellenverzeichnis-Stand2021-10.csv", {
-      header: true,
-      download: true,
-      complete: (result) => {
-        let betriebsstellen = result.data.map((item) => {
-          item.NAME = item['RL100-Langname'];
-          item.DS100 = item['RL100-Code'];
-          return item;
-        });
-        this.haltestellen = this.haltestellen.concat(betriebsstellen);
-      }
-    })
+    const localHaltestellen = localStorage.getItem('haltestellen');
+    this.haltestellen = JSON.parse(localHaltestellen);
+    
+    if (!localHaltestellen) {
+      Papa.parse("/data/D_Bahnhof_2020_alle.CSV", {
+        header: true,
+        download: true,
+        complete: (result) => {
+          this.haltestellen = result.data;
+          localStorage.setItem('haltestellen', JSON.stringify(this.haltestellen));
+        }
+      });
+      Papa.parse("/data/DBNetz-Betriebsstellenverzeichnis-Stand2021-10.csv", {
+        header: true,
+        download: true,
+        complete: (result) => {
+          let betriebsstellen = result.data.map((item) => {
+            item.NAME = item['RL100-Langname'];
+            item.DS100 = item['RL100-Code'];
+            return item;
+          });
+          this.haltestellen = this.haltestellen.concat(betriebsstellen);
+          localStorage.setItem('haltestellen', JSON.stringify(this.haltestellen));
+        }
+      });
+    }
   }
 }
 </script>
