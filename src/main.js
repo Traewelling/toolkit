@@ -8,7 +8,7 @@ Vue.use(VueRouter)
 
 let router = new VueRouter({
     routes: [
-        { path: '/lookup', component: Lookup },
+        { path: '/lookup', component: Lookup, name: 'lookup' },
         { path: '*', redirect: '/lookup' }
     ]
 })

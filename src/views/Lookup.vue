@@ -1,8 +1,8 @@
 <template>
-  <v-layout row wrap>
+  <v-container>
     <v-flex text-xs-center>
       <!-- header -->
-      <h1 class="primary--text display-3 font-weight-medium my-3">Stations</h1>
+      <h1 class="primary--text display-3 font-weight-regular my-3">Stations</h1>
       <v-card>
         <v-list class="pa-0">
           <v-list-item>
@@ -36,7 +36,7 @@
       </v-card>
       <!-- main -->
     </v-flex>
-  </v-layout>
+  </v-container>
 </template>
 
 <script>
