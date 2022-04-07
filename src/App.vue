@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <v-navigation-drawer app>
+    <v-navigation-drawer app expand-on-hover mini-variant>
       <v-list-item>
         <v-list-item-content>
           <v-list-item-title class="text-h6">
@@ -37,14 +37,7 @@
 
     <v-main>
       <v-container>
-        <v-row>
-          <v-col cols="12" sm="5" offset="2">
-            <router-view></router-view>
-          </v-col>
-          <v-col cols="12" sm="2" offset="1">
-
-          </v-col>
-        </v-row>
+        <router-view></router-view>
       </v-container>
     </v-main>
     <v-footer>
@@ -60,8 +53,10 @@ import Footer from "@/components/Footer";
 export default {
   name: 'App',
   components: {Footer},
-  data: () => ({items: [
-      { title: 'DS100 Lookup', icon: 'mdi-text-search', route: 'lookup'},
+  data: () => ({
+    items: [
+      {title: 'DS100 Lookup', icon: 'mdi-text-search', route: 'lookup'},
+      {title: 'Autocomplete', icon: 'mdi-database-search', route: 'autocomplete'}
     ],
   }),
 };

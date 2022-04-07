@@ -1,73 +1,83 @@
 <template>
   <v-container>
-    <v-flex text-xs-center>
-      <!-- header -->
-      <h1 class="primary--text display-3 font-weight-regular my-3">Stations</h1>
-      <v-card>
-        <v-list class="pa-0">
-          <v-list-item>
-            <v-text-field
-                autocomplete="off"
-                autofocus
-                clearable
-                flat
-                hide-details
-                maxlength="1023"
-                label="Station name / DS100 / IBNR"
-                v-model="query"
-            ></v-text-field>
-          </v-list-item>
-        </v-list>
-      </v-card>
-      <v-card class="mt-3">
-        <v-list class="pa-0" dense>
-          <v-list-item-group>
-            <template v-for="station in typeaheadDisplay" >
-              <v-divider v-bind:key="station.EVA_NR + station.DS100 + `-divider`"></v-divider>
-              <StationListEntry
-                  v-bind:key="station.EVA_NR + station.DS100 + `-entry`"
-                  :station="station"
-                  :query="query"
-                  @click="selectStation(station)">
-              </StationListEntry>
-            </template>
-          </v-list-item-group>
-        </v-list>
-      </v-card>
-      <!-- main -->
-    </v-flex>
+    <v-row>
+      <v-col cols="12" offset="1" sm="5">
+        <h1 class="primary--text display-3 font-weight-regular my-3">Stations</h1>
+      </v-col>
+    </v-row>
+    <v-row>
+      <v-col cols="12" offset="1" sm="5">
+        <v-card>
+          <v-list class="pa-0">
+            <v-list-item>
+              <v-text-field
+                  v-model="query"
+                  autocomplete="off"
+                  autofocus
+                  clearable
+                  flat
+                  hide-details
+                  label="Station name / DS100 / IBNR"
+                  maxlength="1023"
+              ></v-text-field>
+            </v-list-item>
+          </v-list>
+        </v-card>
+        <v-card class="mt-3">
+          <v-list class="pa-0" dense>
+            <v-list-item-group>
+              <template v-for="station in typeaheadDisplay">
+                <v-divider v-bind:key="station.EVA_NR + station.DS100 + `-divider`"></v-divider>
+                <StationListEntry
+                    v-bind:key="station.EVA_NR + station.DS100 + `-entry`"
+                    :query="query"
+                    :station="station"
+                    @click="selectStation(station)">
+                </StationListEntry>
+              </template>
+            </v-list-item-group>
+          </v-list>
+        </v-card>
+      </v-col>
+      <v-col cols="12" offset="1" sm="4">
+        <StationCard v-if="selectedStation" :station="selectedStation"/>
+      </v-col>
+    </v-row>
   </v-container>
 </template>
 
 <script>
 import StationListEntry from "@/components/StationListEntry";
 import Papa from "papaparse";
+import StationCard from "../components/Ds100StationCard";
+
 export default {
   name: "Lookup",
-  components: {StationListEntry},
+  components: {StationCard, StationListEntry},
   data() {
     return {
       query: "",
       haltestellen: [],
-      typeaheadDisplay: []
+      typeaheadDisplay: [],
+      selectedStation: null
     };
   },
   watch: {
-    query: function() {
+    query: function () {
       this.autocomplete();
     }
   },
   methods: {
     selectStation(value) {
       this.query = "";
-      console.log(value);
+      this.selectedStation = value;
     },
     autocomplete() {
       if (this.query.length > 1) {
         this.typeaheadDisplay = [];
         for (const haltestellenElement of this.haltestellen) {
           try {
-            if (this.typeaheadDisplay.length > 20){
+            if (this.typeaheadDisplay.length > 20) {
               break;
             }
             if (this.filterConditions(haltestellenElement)) {
@@ -96,7 +106,7 @@ export default {
   mounted() {
     const localHaltestellen = localStorage.getItem('haltestellen');
     this.haltestellen = JSON.parse(localHaltestellen);
-    
+
     if (!localHaltestellen) {
       Papa.parse("/data/D_Bahnhof_2020_alle.CSV", {
         header: true,
