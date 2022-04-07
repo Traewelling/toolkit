@@ -3,5 +3,5 @@ module.exports = {
     'vuetify'
   ],
   runtimeCompiler: true,
-  publicPath: 'toolkit'
+  publicPath: '/toolkit/'
 }
