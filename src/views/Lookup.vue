@@ -60,12 +60,14 @@
 import StationListEntry from "@/components/StationListEntry";
 import Papa from "papaparse";
 import StationCard from "../components/Ds100StationCard";
+import config from "../../vue.config";
 
 export default {
   name: "Lookup",
   components: {StationCard, StationListEntry},
   data() {
     return {
+      config: config,
       query: "",
       loading: 0,
       haltestellen: [],
@@ -115,7 +117,7 @@ export default {
     loadStations() {
       this.loading = 2;
       localStorage.setItem('haltestellen', '');
-      Papa.parse("/data/D_Bahnhof_2020_alle.CSV", {
+      Papa.parse(config.publicPath + "data/D_Bahnhof_2020_alle.CSV", {
         header: true,
         download: true,
         complete: (result) => {
@@ -125,7 +127,7 @@ export default {
         },
         error: () => {this.loading=0;}
       });
-      Papa.parse("/data/DBNetz-Betriebsstellenverzeichnis-Stand2021-10.csv", {
+      Papa.parse(config.publicPath + "/data/DBNetz-Betriebsstellenverzeichnis-Stand2021-10.csv", {
         header: true,
         download: true,
         complete: (result) => {
